@@ -1,8 +1,49 @@
 import React from 'react';
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-
+import {useNavigate } from 'react-router';
 
 const Register = () => {
+
+    const navigate=useNavigate ();
+
+    const [user, setUser] = useState({
+        username:"",
+        email:"",
+        password:""
+        
+    });
+    const handleInput=(event)=>{
+        let name=event.target.name;
+        let value=event.target.value;
+        setUser({...user,[name]:value});
+    }
+    const handleSubmit= async (event)=>{
+        event.preventDefault();
+        const {username,email,password}=user;
+        
+        try {
+            const res=await fetch('/register', {
+                method:'POST',
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    username,email,password
+                })
+            })
+            if(res.status===400||!res){
+                window.alert("Already used this details")
+            }else{
+                window.alert("Registered Sucessfully")
+                navigate('/login')
+                
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }    
+    
   return (
     <div>
        <div className="container shadow my-5">
@@ -16,19 +57,19 @@ const Register = () => {
                     </div>
                     <div className="col-md-6 p-5">
                         <h1 className="display-6 fw-bolder mb-5">REGISTER</h1>
-                        <form>
+                        <form onSubmit={handleSubmit} method='POST'>
                         <div className="mb-3">
                                 <label for="name" lass="form-label">Username</label>
-                                <input type="text" className="form-control" id="name"/>
+                                <input type="text" className="form-control" id="name" name="username" value={user.username} onChange={handleInput} />
                             </div>
                             <div className="mb-3">
                                 <label for="exampleInputEmail1" className="form-label">Email address</label>
-                                <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" />
+                                <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email" value={user.email} onChange={handleInput}/>
                                 <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
                             </div>
                             <div className="mb-3">
                                 <label for="exampleInputPassword1" className="form-label">Password</label>
-                                <input type="password" className="form-control" id="exampleInputPassword1" />
+                                <input type="password" className="form-control" id="exampleInputPassword1" name="password" value={user.password} onChange={handleInput}/>
                             </div>
                             <div className="mb-3 form-check">
                                 <input type="checkbox" className="form-check-input" id="exampleCheck1" />
